@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/alecthomas/kong"
 	"hashcode2021/m/v2/src/input"
-	"hashcode2021/m/v2/src/parser"
 	"hashcode2021/m/v2/src/parserutils"
 	"hashcode2021/m/v2/src/problemset"
 	"hashcode2021/m/v2/src/strategies"
