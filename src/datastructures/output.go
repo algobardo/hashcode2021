@@ -14,6 +14,10 @@ type IntersectionSchedule struct {
 	StreetSchedulesList []*StreetSchedule
 }
 
+func (s IntersectionSchedule) NextScheduleAfter(street StreetID) StreetSchedule {
+
+}
+
 type StreetSchedule struct {
 	StreetID           StreetID
 	GreenLightDuration int

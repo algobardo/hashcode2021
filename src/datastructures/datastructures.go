@@ -11,7 +11,6 @@ type CarID int
 type Car struct {
 	ID       CarID
 	Path     []*Street
-	Position int
 }
 
 type Street struct {
