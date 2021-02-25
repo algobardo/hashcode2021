@@ -36,7 +36,10 @@ func (n *NaiveV2) Apply(input *datastructures.Input) Output {
 			schedule.StreetSchedules[streetID] = streetSchedule
 			schedule.StreetSchedulesList = append(schedule.StreetSchedulesList, streetSchedule)
 		}
-		schedules[intersectionID] = schedule
+		if len(schedule.StreetSchedules) > 0 {
+			schedules[intersectionID] = schedule
+		}
+
 	}
 	return &datastructures.Solution{
 		Schedules: schedules,

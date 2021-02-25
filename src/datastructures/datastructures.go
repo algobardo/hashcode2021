@@ -9,8 +9,8 @@ type IntersectionID int
 type CarID int
 
 type Car struct {
-	ID       CarID
-	Path     []*Street
+	ID   CarID
+	Path []*Street
 }
 
 type Street struct {
