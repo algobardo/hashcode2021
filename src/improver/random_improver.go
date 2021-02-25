@@ -3,17 +3,91 @@ package improver
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"math/rand"
-	"path/filepath"
+	"runtime"
 	"sync"
 
-	"hashcode2021/m/v2/src/parser"
+	"hashcode2021/m/v2/src/parallelexecutor"
+	"hashcode2021/m/v2/src/problemset"
 )
 
+type Output *struct{}
+type Input *struct{}
 
-func LoadBestOutput(path string) *Output{
-	f, err := ioutil.ReadFile(filepath.Join(parser.dataFolder, name+".best"))
+type Improver struct {
+	problems problemset.ProblemSet
+	score    func(Input, Output) int
+	strategy func(Input) Output
+	loader   func(string) Input
+
+	inputs  []Input
+	outputs []Output
+	scores  []int
+	lock    sync.RWMutex
+}
+
+func New(problems problemset.ProblemSet,
+	score func(Input, Output) int,
+	strategy func(Input) Output,
+	loader func(string) Input,
+) *Improver {
+	return &Improver{
+		problems: problems,
+		score:    score,
+		strategy: strategy,
+		loader:   loader,
+	}
+}
+
+func (i *Improver) ImproveAllSolutions() {
+	rand.Seed(42)
+
+	for _, name := range i.problems.ListNames() {
+		input := i.loader(i.problems.GetProblemInputPath(name))
+		output := i.loadBestOutput(i.problems.GetProblemSolutionPath(name))
+		if output == nil {
+			res := i.strategy(input)
+			println(fmt.Sprintf("Computed simulation for %s", name))
+			output = res
+		}
+		score := i.score(input, output)
+
+		i.inputs = append(i.inputs, input)
+		i.outputs = append(i.outputs, output)
+		i.scores = append(i.scores, score)
+	}
+
+	exec := parallelexecutor.New(context.Background(), runtime.GOMAXPROCS(-1))
+	for {
+		exec.Go(func() error {
+			chosenProblem := rand.Intn(len(i.outputs))
+			problemName := i.problems.ListNames()[chosenProblem]
+
+			i.lock.RLock()
+			curScore := i.scores[chosenProblem]
+			curOutput := i.copyOutput(i.outputs[chosenProblem])
+			input := i.inputs[chosenProblem]
+			i.lock.RUnlock()
+
+			newOutput, newScore := i.tryImprove(input, curOutput, curScore)
+			if newOutput != nil {
+				i.lock.Lock()
+				println(fmt.Sprintf("Improved %s from %d to %d, total: %d", problemName, i.scores[chosenProblem], newScore, i.total(i.scores)))
+
+				i.outputs[chosenProblem] = newOutput
+				i.scores[chosenProblem] = newScore
+				i.saveBestOutput(newOutput, problemName)
+				i.lock.Unlock()
+			}
+			return nil
+		})
+	}
+}
+
+func (i *Improver) loadBestOutput(problemName string) Output {
+	f, err := ioutil.ReadFile(i.problems.GetProblemSolutionImprovedPath(problemName))
 	if err != nil {
 		return nil
 	}
@@ -23,70 +97,22 @@ func LoadBestOutput(path string) *Output{
 	if err != nil {
 		panic("invalid output")
 	}
-	return &output
+	return output
 }
 
-func ImproveAllSolutions(names []string) {
-	rand.Seed(42)
-
-	var inputs []*parser.Input
-	var outputs []*Output
-	var scores []int
-	for _, name := range names {
-		input := parser.LoadInput(name)
-		output := LoadBestOutput(name)
-		if output == nil {
-			res := main.Simulation(input)
-			println(fmt.Sprintf("Computed simulation for %s", name))
-			output = &res
-		}
-		score, err := Score(input, *output)
-		if err != nil {
-			panic(err.Error())
-		}
-
-		inputs = append(inputs, input)
-		outputs = append(outputs, output)
-		scores = append(scores, score)
+func (i *Improver) saveBestOutput(output Output, problemName string) {
+	bytes, err := json.MarshalIndent(output, "", "  ")
+	if err != nil {
+		panic("failed marshalling output")
 	}
 
-
-	exec := NewThrottledExecutor(context.Background(), 10)
-	var lock sync.RWMutex
-	for {
-		exec.Go(func() error {
-			i := rand.Intn(len(outputs))
-
-			lock.RLock()
-			curScore := scores[i]
-			curOutput := copyOutput(outputs[i])
-			input := inputs[i]
-			lock.RUnlock()
-
-			newOutput, newScore := tryImprove(input, curOutput, curScore)
-			if newOutput != nil {
-				lock.Lock()
-				println(fmt.Sprintf("Improved %s from %d to %d, total: %d", names[i], scores[i], newScore, total(scores)))
-
-				bytes, err := json.MarshalIndent(newOutput, "", "  ")
-				if err != nil {
-					panic("failed marshalling output")
-				}
-				err = ioutil.WriteFile(filepath.Join(parser.dataFolder, names[i]+".best"), bytes, 0775)
-				if err != nil {
-					panic("failed writing output")
-				}
-
-				outputs[i] = newOutput
-				scores[i] = newScore
-				lock.Unlock()
-			}
-			return nil
-		})
+	err = ioutil.WriteFile(i.problems.GetProblemSolutionImprovedPath(problemName), bytes, 0775)
+	if err != nil {
+		panic("failed writing output")
 	}
 }
 
-func total(scores []int) int {
+func (i *Improver) total(scores []int) int {
 	cur := 0
 	for _, score := range scores {
 		cur += score
@@ -94,28 +120,21 @@ func total(scores []int) int {
 	return cur
 }
 
-func tryImprove(input *parser.Input, output *Output, curScore int) (*Output, int) {
+func (i *Improver) tryImprove(input Input, output Output, curScore int) (Output, int) {
 	operation := rand.Intn(1)
 	switch operation {
 	case 0:
-		swapLibrary(output)
+		// do something
+		print("implement me")
 	}
-	newScore := score(input, output)
+	newScore := i.score(input, output)
 	if newScore > curScore {
 		return output, newScore
 	}
 	return nil, -1
 }
 
-func swapLibrary(output *Output) {
-	x := rand.Intn(len(output.Libraries))
-	y := rand.Intn(len(output.Libraries))
-	xLibrary := output.Libraries[x]
-	output.Libraries[x] = output.Libraries[y]
-	output.Libraries[y] = xLibrary
-}
-
-func copyOutput(out *Output) *Output {
+func (i *Improver) copyOutput(out Output) Output {
 	bytes, err := json.Marshal(out)
 	if err != nil {
 		panic(err.Error())
@@ -125,14 +144,5 @@ func copyOutput(out *Output) *Output {
 	if err != nil {
 		panic(err.Error())
 	}
-	return &copy
+	return copy
 }
-
-func score(input *parser.Input, output *Output) int {
-	score, err := Score(input, *output)
-	if err != nil {
-		panic(err.Error())
-	}
-	return score
-}
-*/
