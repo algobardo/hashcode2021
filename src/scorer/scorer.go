@@ -22,19 +22,23 @@ type Meta struct {
 
 func setupState(input *datastructures.Input, output *datastructures.Solution) *State {
 	s := &State{
-		CarCompletionTime: map[datastructures.CarID]int{},
+		CarCompletionTime:    map[datastructures.CarID]int{},
 		CarPositionInItsPath: map[datastructures.CarID]int{},
-		GreenRemainingTime: map[datastructures.IntersectionID]int{},
-		IncomingGreenStreet: map[datastructures.IntersectionID]datastructures.StreetID{},
-		StreetQueues: map[datastructures.StreetID][]datastructures.CarID{},
+		GreenRemainingTime:   map[datastructures.IntersectionID]int{},
+		IncomingGreenStreet:  map[datastructures.IntersectionID]datastructures.StreetID{},
+		StreetQueues:         map[datastructures.StreetID][]datastructures.CarID{},
 		Now:                  0,
 	}
 
-		for _, street := range input.Streets {
-			s.StreetQueues[street.ID] = append([]datastructures.CarID{}, street.Queue...)
-		}
 	for _, street := range input.Streets {
 		s.StreetQueues[street.ID] = append([]datastructures.CarID{}, street.Queue...)
+	}
+	for _, intersectionSchedule := range output.Schedules {
+		if len(intersectionSchedule.StreetSchedulesList) > 0 {
+			firstSchedule := intersectionSchedule.StreetSchedulesList[0]
+			s.IncomingGreenStreet[intersectionSchedule.IntersectionID] = firstSchedule.StreetID
+			s.GreenRemainingTime[intersectionSchedule.IntersectionID] = firstSchedule.GreenLightDuration
+		}
 	}
 
 	return s
@@ -77,6 +81,14 @@ func Step(input *datastructures.Input, output *datastructures.Solution, state *S
 	}
 }
 
-func Score(input datastructures.Input, output datastructures.Solution) int {
-
+func Score(input *datastructures.Input, output *datastructures.Solution) int {
+	currentState := setupState(input,output)
+	for i := 0; i < input.Duration; i++ {
+		Step(input, output, currentState)
+	}
+	totalPoints := 0
+	for _, completionTime := range currentState.CarCompletionTime {
+		totalPoints += input.BonusPoints + (input.Duration - completionTime)
+	}
+	return totalPoints
 }
