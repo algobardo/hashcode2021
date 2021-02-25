@@ -1,7 +1,18 @@
 package improver
 
-/*
-func LoadBestOutput(name string) *Output{
+import (
+	"context"
+	"encoding/json"
+	"io/ioutil"
+	"math/rand"
+	"path/filepath"
+	"sync"
+
+	"hashcode2021/m/v2/src/parser"
+)
+
+
+func LoadBestOutput(path string) *Output{
 	f, err := ioutil.ReadFile(filepath.Join(parser.dataFolder, name+".best"))
 	if err != nil {
 		return nil
