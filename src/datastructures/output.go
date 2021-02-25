@@ -5,20 +5,17 @@ import (
 	"strings"
 )
 
-type IntersectionID int
-type StreetID string
-
 type Solution struct {
 	Schedules map[IntersectionID]*IntersectionSchedule
 }
 
 type IntersectionSchedule struct {
-	IntersectionID IntersectionID
+	IntersectionID  IntersectionID
 	StreetSchedules map[StreetID]*StreetSchedule
 }
 
 type StreetSchedule struct {
-	StreetID StreetID
+	StreetID           StreetID
 	GreenLightDuration int
 }
 
