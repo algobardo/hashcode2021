@@ -34,5 +34,5 @@ func (p ProblemSet) GetProblemSolutionImprovedPath(name string) string {
 }
 
 func (p ProblemSet) ListNames() []string {
-	return []string{"a", "b", "c", "d"}
+	return []string{"a", "b", "c", "d", "e", "f"}
 }
