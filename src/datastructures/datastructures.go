@@ -1,30 +1,35 @@
 package datastructures
 
-type BookID int
+type StreetID string
 
-type LibraryID int
+type IntersectionID int
+
+type CarID int
+
+type Car struct {
+	ID     CarID
+	Path   []*Street
+	Street int
+}
+
+type Street struct {
+	ID     StreetID
+	Start  *Intersection
+	End    *Intersection
+	Length int
+	Queue  []*Car
+}
+
+type Intersection struct {
+	ID         IntersectionID
+	StreetsIn  []*Street
+	StreetsOut []*Street
+}
 
 type Input struct {
-	BooksTotal     int
-	LibrariesTotal int
-	Days           int
-
-	BooksScore BooksScore
-	Libraries  []*Library
-}
-
-type BooksScore []int
-
-type Library struct {
-	DaysForSignUp      int
-	BooksShippedPerDay int
-	Books              []BookID
-	BestBooks          []SortedBook
-	BestUniqueBooks    []SortedBook
-	ID                 LibraryID
-}
-
-type SortedBook struct {
-	Book  BookID
-	Score int
+	Duration          int
+	IntersectionCount int
+	StreetCount       int
+	CarCount          int
+	BonusPoints       int
 }
