@@ -2,6 +2,7 @@ package datastructures
 
 import (
 	"strconv"
+	"strings"
 )
 
 type Solution struct {
@@ -37,8 +38,12 @@ func (s *Solution) ToStrings() []string {
 		lines = append(lines, strconv.Itoa(int(intersectionSchedule.IntersectionID)))
 		lines = append(lines, strconv.Itoa(len(intersectionSchedule.StreetSchedules)))
 		for _, streetSchedule := range intersectionSchedule.StreetSchedulesList {
-			lines = append(lines, string(streetSchedule.StreetID))
-			lines = append(lines, strconv.Itoa(streetSchedule.GreenLightDuration))
+			lines = append(lines)
+			elements := []string{
+				string(streetSchedule.StreetID),
+				strconv.Itoa(streetSchedule.GreenLightDuration),
+			}
+			lines = append(lines, strings.Join(elements, " "))
 		}
 	}
 	return lines
