@@ -24,8 +24,8 @@ type Street struct {
 
 type Intersection struct {
 	ID         IntersectionID
-	StreetsIn  []*Street
-	StreetsOut []*Street
+	StreetsIn  []StreetID
+	StreetsOut []StreetID
 }
 
 type Input struct {
@@ -35,11 +35,20 @@ type Input struct {
 	CarCount          int
 	BonusPoints       int
 
-	Cars    []*Car
-	Streets map[StreetID]*Street
+	Cars          []*Car
+	Streets       map[StreetID]*Street
+	Intersections map[IntersectionID]*Intersection
 }
 
 func (i *Input) Dumps() string {
 	bs, _ := json.MarshalIndent(i, "", "  ")
 	return string(bs)
+}
+
+func (i *Input) GetStreet(id StreetID) *Street {
+	return i.Streets[id]
+}
+
+func (i *Input) GetIntersection(id IntersectionID) *Intersection {
+	return i.Intersections[id]
 }

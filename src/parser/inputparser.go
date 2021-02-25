@@ -80,8 +80,22 @@ func Parse(lines []string) *datastructures.Input {
 		lineNumber++
 	}
 
+	intersections := map[datastructures.IntersectionID]*datastructures.Intersection{}
+	for i := 0; i < input.IntersectionCount; i++ {
+		intersections[datastructures.IntersectionID(i)] = &datastructures.Intersection{}
+	}
+
+	for streetID, street := range streets {
+		intersectionEnd := intersections[street.End]
+		intersectionEnd.StreetsIn = append(intersectionEnd.StreetsIn, streetID)
+
+		intersectionStart := intersections[street.Start]
+		intersectionStart.StreetsOut = append(intersectionStart.StreetsOut, streetID)
+	}
+
 	input.Streets = streets
 	input.Cars = cars
+	input.Intersections = intersections
 
 	return input
 }
