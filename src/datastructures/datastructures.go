@@ -13,10 +13,6 @@ type Car struct {
 	Path []*Street
 }
 
-func (c *Car) CurrentStreet() *Street {
-	return c.Path[c.Position]
-}
-
 type Street struct {
 	ID     StreetID
 	Start  IntersectionID
