@@ -76,9 +76,8 @@ func Step(input *datastructures.Input, output *datastructures.Solution, state *S
 			state.GreenRemainingTime[intersectionScheduled.IntersectionID] = nextSchedule.GreenLightDuration
 			state.IncomingGreenStreet[intersectionScheduled.IntersectionID] = nextSchedule.StreetID
 		}
-
-		state.Now+=1
 	}
+	state.Now+=1
 }
 
 func Score(input *datastructures.Input, output *datastructures.Solution) int {

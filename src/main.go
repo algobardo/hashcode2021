@@ -7,6 +7,7 @@ import (
 	"hashcode2021/m/v2/src/parser"
 	"hashcode2021/m/v2/src/parserutils"
 	"hashcode2021/m/v2/src/problemset"
+	"hashcode2021/m/v2/src/scorer"
 	"hashcode2021/m/v2/src/strategies"
 
 	"github.com/alecthomas/kong"
@@ -43,7 +44,7 @@ func (p *NaiveStrategy) Run() error {
 	output := naiveStrategy.Apply(input).(*datastructures.Solution)
 	parserutils.ToStdOut(output.ToStrings())
 
-	//println(fmt.Sprintf("Score %d", scorer.Score(input, output)))
+	println(fmt.Sprintf("Score %d", scorer.Score(input, output)))
 
 	return nil
 }
