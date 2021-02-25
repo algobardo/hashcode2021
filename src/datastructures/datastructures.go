@@ -1,5 +1,7 @@
 package datastructures
 
+import "encoding/json"
+
 type StreetID string
 
 type IntersectionID int
@@ -7,9 +9,9 @@ type IntersectionID int
 type CarID int
 
 type Car struct {
-	ID     CarID
-	Path   []*Street
-	Street int
+	ID       CarID
+	Path     []*Street
+	Position int
 }
 
 type Street struct {
@@ -17,7 +19,7 @@ type Street struct {
 	Start  IntersectionID
 	End    IntersectionID
 	Length int
-	Queue  []*Car
+	Queue  []CarID
 }
 
 type Intersection struct {
@@ -35,4 +37,9 @@ type Input struct {
 
 	Cars    []*Car
 	Streets map[StreetID]*Street
+}
+
+func (i *Input) Dumps() string {
+	bs, _ := json.MarshalIndent(i, "", "  ")
+	return string(bs)
 }

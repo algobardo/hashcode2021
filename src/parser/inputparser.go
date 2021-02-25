@@ -1,8 +1,6 @@
 package parser
 
 import (
-	"io/ioutil"
-	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -10,34 +8,36 @@ import (
 )
 
 func LoadInput(folder, name string) *datastructures.Input {
-	dataFiles, err := ioutil.ReadDir(folder)
-	if err != nil {
-		panic(err.Error())
-	}
-	fileName := ""
-	for _, file := range dataFiles {
-		if strings.HasPrefix(file.Name(), name+"_") && strings.HasSuffix(file.Name(), ".txt") {
-			fileName = file.Name()
-			break
+	return nil
+	/*
+		dataFiles, err := ioutil.ReadDir(folder)
+		if err != nil {
+			panic(err.Error())
 		}
-	}
-	if len(fileName) == 0 {
-		panic("wrong filename")
-	}
-	fileContent, err := ioutil.ReadFile(filepath.Join(folder, fileName))
-	if err != nil {
-		panic(err.Error())
-	}
+		fileName := ""
+		for _, file := range dataFiles {
+			if strings.HasPrefix(file.Name(), name+"_") && strings.HasSuffix(file.Name(), ".txt") {
+				fileName = file.Name()
+				break
+			}
+		}
+		if len(fileName) == 0 {
+			panic("wrong filename")
+		}
+		fileContent, err := ioutil.ReadFile(filepath.Join(folder, fileName))
+		if err != nil {
+			panic(err.Error())
+		}
 
-	return PostProcess(Parse(string(fileContent)))
+		return PostProcess(Parse(string(fileContent)))
+	*/
 }
 
 func PostProcess(i *datastructures.Input) *datastructures.Input {
 	return i
 }
 
-func Parse(s string) *datastructures.Input {
-	lines := strings.Split(s, "\n")
+func Parse(lines []string) *datastructures.Input {
 	lineNumber := 0
 	firstLine := strings.Split(lines[lineNumber], " ")
 	lineNumber++
@@ -49,7 +49,7 @@ func Parse(s string) *datastructures.Input {
 		BonusPoints:       parseInt(firstLine[4]),
 	}
 
-	var streets map[datastructures.StreetID]*datastructures.Street
+	streets := map[datastructures.StreetID]*datastructures.Street{}
 	for s := 0; s < input.StreetCount; s++ {
 		vals := strings.Split(lines[lineNumber], " ")
 		street := &datastructures.Street{
@@ -57,7 +57,7 @@ func Parse(s string) *datastructures.Input {
 			Start:  datastructures.IntersectionID(parseInt(vals[0])),
 			End:    datastructures.IntersectionID(parseInt(vals[1])),
 			Length: parseInt(vals[3]),
-			Queue:  []*datastructures.Car{},
+			Queue:  []datastructures.CarID{},
 		}
 		streets[street.ID] = street
 		lineNumber++
@@ -75,7 +75,7 @@ func Parse(s string) *datastructures.Input {
 			streetID := datastructures.StreetID(vals[1+p])
 			car.Path = append(car.Path, streets[streetID])
 		}
-
+		streets[car.Path[0].ID].Queue = append(streets[car.Path[0].ID].Queue, car.ID)
 		cars = append(cars, car)
 		lineNumber++
 	}

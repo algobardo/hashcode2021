@@ -2,25 +2,23 @@ package main
 
 import (
 	"fmt"
-	"github.com/alecthomas/kong"
-	"hashcode2021/m/v2/src/input"
+	"hashcode2021/m/v2/src/parser"
 	"hashcode2021/m/v2/src/parserutils"
 	"hashcode2021/m/v2/src/problemset"
-	"hashcode2021/m/v2/src/strategies"
-)
 
+	"github.com/alecthomas/kong"
+)
 
 type (
 	NaiveStrategy struct {
-		Print     bool `help:"print"`
-		Folder string `arg name:"folder" help:"Folder with problems." type:"string"`
+		Print       bool   `help:"print"`
+		Folder      string `arg name:"folder" help:"Folder with problems." type:"string"`
 		ProblemName string `arg name:"problem" help:"File with a problem." type:"string"`
 	}
 
 	DoSomethingElse struct {
 		Paths []string `arg optional name:"path" help:"Paths to list." type:"path"`
 	}
-
 )
 
 var CLI struct {
@@ -36,10 +34,11 @@ func (p *NaiveStrategy) Run() error {
 	if err != nil {
 		return err
 	}
-	input := input.InputFromLines(lines)
-	naiveStrategy := strategies.NewNaiveStrategy()
-	output := naiveStrategy.Apply(input)
-	parserutils.ToStdOut(output.ToStrings())
+	input := parser.Parse(lines.Lines)
+	fmt.Println(input.Dumps())
+	//naiveStrategy := strategies.NewNaiveStrategy()
+	//output := naiveStrategy.Apply(input)
+	//parserutils.ToStdOut(output.ToStrings())
 	return nil
 }
 

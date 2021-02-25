@@ -7,15 +7,15 @@ import (
 )
 
 type Lines struct {
-	lines []string
+	Lines []string
 }
 
 func (l Lines) GetNth(n uint) string {
-	return l.lines[n]
+	return l.Lines[n]
 }
 
 func (l Lines) GetNthValues(n uint) []string {
-	return strings.Split(l.lines[n], " ")
+	return strings.Split(l.Lines[n], " ")
 }
 
 func LoadInputAsLines(filename string) (*Lines, error) {
@@ -25,7 +25,7 @@ func LoadInputAsLines(filename string) (*Lines, error) {
 	}
 
 	lines := strings.Split(s, "\n")
-	return &Lines{lines: lines}, err
+	return &Lines{Lines: lines}, err
 }
 
 func LoadInputAsString(filename string) (string, error) {
