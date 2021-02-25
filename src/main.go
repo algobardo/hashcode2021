@@ -19,6 +19,7 @@ func main() {
 	ctx := kong.Parse(&CLI)
 	switch ctx.Command() {
 	case "parse <path>":
+
 	case "do-something-else":
 	default:
 		panic(ctx.Command())
