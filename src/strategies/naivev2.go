@@ -29,10 +29,7 @@ func (n *NaiveV2) Apply(input *datastructures.Input) Output {
 				continue
 			}
 			streetID := street.ID
-			duration := 1
-			if hits[streetID]*len(streets) > sum {
-				duration = 2
-			}
+			duration := computeDuration(sum, hits[streetID], len(streets))
 			streetSchedule := &datastructures.StreetSchedule{
 				StreetID:           streetID,
 				GreenLightDuration: duration,
@@ -123,7 +120,9 @@ func NewNaiveV2Strategy() Strategy {
 func computeDuration(sum int, hits int, streets int) int {
 	duration := 1
 	for i := 1; i <= streets; i++ {
-
+		if hits*streets > i*sum {
+			duration = i + 1
+		}
 	}
 	return duration
 }
