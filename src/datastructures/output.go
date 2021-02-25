@@ -14,8 +14,15 @@ type IntersectionSchedule struct {
 	StreetSchedulesList []*StreetSchedule
 }
 
-func (s IntersectionSchedule) NextScheduleAfter(street StreetID) StreetSchedule {
-
+func (s *IntersectionSchedule) NextScheduleAfter(street StreetID) *StreetSchedule {
+	idx := -1
+	for i, streetSchedule := range s.StreetSchedulesList {
+		if streetSchedule.StreetID == street {
+			idx = i
+			break
+		}
+	}
+	return s.StreetSchedulesList[(idx+1)%len(s.StreetSchedulesList)]
 }
 
 type StreetSchedule struct {
