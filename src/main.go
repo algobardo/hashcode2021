@@ -1,22 +1,17 @@
 package main
 
 import (
-    "fmt"
     "os"
+
+    "hashcode2021/m/v2/src/parser"
 )
 
 func main() {
     algo := os.Args[1]
     name := os.Args[2]
 
-    input := LoadInput(name)
-    var output Output
-    if algo == "naive" {
-        output = naive(input)
-    } else if algo == "sim" {
-        output = Simulation(input)
-    } else {
-        fmt.Println("unknown argument 1")
-    }
-    toStdOut(output)
+    input := parser.LoadInput("./data", name)
+
+    println(algo, name, input.String())
+
 }
