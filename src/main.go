@@ -1,32 +1,57 @@
 package main
 
 import (
+	"fmt"
 	"github.com/alecthomas/kong"
-	"hashcode2021/m/v2/src/parserutils"
-	"hashcode2021/m/v2/src/strategies"
+	"hashcode2021/m/v2/src/parser"
+	"hashcode2021/m/v2/src/problemset"
 )
 
-var CLI struct {
+
+type (
 	Parse struct {
 		Print     bool `help:"print"`
-		Paths []string `arg name:"path" help:"Paths to parse." type:"path"`
-	} `cmd help:"Remove files."`
+		Folder string `arg name:"folder" help:"Folder with problems." type:"string"`
+		ProblemName string `arg name:"problem" help:"File with a problem." type:"string"`
+	}
 
 	DoSomethingElse struct {
 		Paths []string `arg optional name:"path" help:"Paths to list." type:"path"`
-	} `cmd help:"List paths."`
+	}
+
+)
+
+var CLI struct {
+	Parse Parse `cmd help:"Remove files."`
+	DoSomethingElse DoSomethingElse `cmd help:"List paths."`
+}
+
+func (p *Parse) Run() error {
+	ps := problemset.NewProblemSet(p.Folder)
+	inputPath := ps.GetProblemInputPath(p.ProblemName)
+	parser.LoadInput()
+	//	var s strategies.Strategy
+	//	var input strategies.Input
+	//	output := s.Apply(input)
+	//	parserutils.ToStdOut(output.ToStrings())
+	fmt.Println("rm", p.Path)
+	return nil
+}
+
+func (p *DoSomethingElse) Run() error {
+	fmt.Println("sh", p.Paths)
+	return nil
 }
 
 func main() {
 	ctx := kong.Parse(&CLI)
-	switch ctx.Command() {
-	case "parse <path>":
-		var s strategies.Strategy
-		var input strategies.Input
-		output := s.Apply(input)
-		parserutils.ToStdOut(output.ToStrings())
-	case "do-something-else":
-	default:
-		panic(ctx.Command())
-	}
+	ctx.Run()
+	//
+	//switch ctx.Command() {
+	//case "parse <path>":
+
+	//case "do-something-else":
+	//default:
+	//	panic(ctx.Command())
+	//}
 }
