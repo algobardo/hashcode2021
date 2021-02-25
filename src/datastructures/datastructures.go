@@ -34,7 +34,7 @@ type Input struct {
 	CarCount          int
 	BonusPoints       int
 
-	Cars          []*Car
+	Cars          map[CarID]*Car
 	Streets       map[StreetID]*Street
 	Intersections map[IntersectionID]*Intersection
 }
@@ -50,4 +50,8 @@ func (i *Input) GetStreet(id StreetID) *Street {
 
 func (i *Input) GetIntersection(id IntersectionID) *Intersection {
 	return i.Intersections[id]
+}
+
+func (i *Input) GetCar(car CarID) interface{} {
+
 }

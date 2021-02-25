@@ -12,6 +12,7 @@ type State struct {
 	CarPositionInItsPath map[datastructures.CarID]int
 	GreenRemainingTime map[datastructures.IntersectionID]int
 	IncomingGreenStreet map[datastructures.IntersectionID]datastructures.StreetID
+	StreetQueues map[datastructures.StreetID][]datastructures.CarID
 	Now int
 }
 
@@ -19,28 +20,48 @@ type Meta struct {
 	StreetIntersections map[datastructures.StreetID][]datastructures.IntersectionID
 }
 
-func Step(input datastructures.Input, output datastructures.Solution, state State, meta Meta) {
+func setupState(input *datastructures.Input, output *datastructures.Solution) *State {
+	s := &State{
+		CarCompletionTime: map[datastructures.CarID]int{},
+		CarPositionInItsPath: map[datastructures.CarID]int{},
+		GreenRemainingTime: map[datastructures.IntersectionID]int{},
+		IncomingGreenStreet: map[datastructures.IntersectionID]datastructures.StreetID{},
+		StreetQueues: map[datastructures.StreetID][]datastructures.CarID{},
+		Now:                  0,
+	}
+
+		for _, street := range input.Streets {
+			s.StreetQueues[street.ID] = append([]datastructures.CarID{}, street.Queue...)
+		}
+	for _, street := range input.Streets {
+		s.StreetQueues[street.ID] = append([]datastructures.CarID{}, street.Queue...)
+	}
+
+	return s
+}
+
+func Step(input *datastructures.Input, output *datastructures.Solution, state *State) {
 	for _, intersectionScheduled := range output.Schedules {
 		remaining := state.GreenRemainingTime[intersectionScheduled.IntersectionID]
-		state.GreenRemainingTime[intersectionScheduled.IntersectionID] =  remaining-1
+		state.GreenRemainingTime[intersectionScheduled.IntersectionID] = remaining-1
 
 		currentGreenStreet := state.IncomingGreenStreet[intersectionScheduled.IntersectionID]
 
-		// move cars that can be moved, i.e. they are at front of the line
-		for _, car := range input.Cars {
-			if _, isCompleted := state.CarCompletionTime[car.ID]; !isCompleted {
-				newPathPosition := state.CarPositionInItsPath[car.ID]+1
-				if canMove(car, input, output, meta) {
-					if newPathPosition < len(car.Path) {
-						// still some way to go
-						state.CarPositionInItsPath[car.ID] = newPathPosition
-					} else {
-						state.CarCompletionTime[car.ID] = state.Now
-					}
-				}
+		// moving the cars that are front of the queue on the green incoming street
+		streetQueue := state.StreetQueues[currentGreenStreet]
+		if len(streetQueue) > 0 {
+			firstCar := streetQueue[0]
+			firstCarInfo := input.Cars[firstCar]
+			state.StreetQueues[currentGreenStreet] =streetQueue[1:]
+			newPathPosition := state.CarPositionInItsPath[firstCar]+1
+			if newPathPosition < len(firstCarInfo.Path) {
+				state.CarPositionInItsPath[firstCar] = newPathPosition
+				state.StreetQueues[currentGreenStreet] = append(state.StreetQueues[currentGreenStreet],firstCar)
+			} else {
+				state.CarCompletionTime[firstCar] = state.Now
 			}
 		}
-		
+
 		// move the semaphore to the next incoming street
 		if remaining == 0 {
 			intersectionSchedule := output.Schedules[intersectionScheduled.IntersectionID]
@@ -52,13 +73,9 @@ func Step(input datastructures.Input, output datastructures.Solution, state Stat
 			state.IncomingGreenStreet[intersectionScheduled.IntersectionID] = nextSchedule.StreetID
 		}
 
+		state.Now+=1
 	}
 }
-
-func canMove(car *datastructures.Car, input datastructures.Input, output datastructures.Solution, meta Meta) bool {
-
-}
-
 
 func Score(input datastructures.Input, output datastructures.Solution) int {
 
