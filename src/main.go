@@ -29,6 +29,7 @@ var CLI struct {
 }
 
 func (p *NaiveStrategy) Run() error {
+	// ./main naive ~/tmp foo.txt
 	ps := problemset.NewProblemSet(p.Folder)
 	inputPath := ps.GetProblemInputPath(p.ProblemName)
 	lines, err := parserutils.LoadInputAsLines(inputPath)
