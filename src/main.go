@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+
+	"hashcode2021/m/v2/src/datastructures"
 	"hashcode2021/m/v2/src/parser"
 	"hashcode2021/m/v2/src/parserutils"
 	"hashcode2021/m/v2/src/problemset"
@@ -38,8 +40,11 @@ func (p *NaiveStrategy) Run() error {
 	input := parser.Parse(lines.Lines)
 	//fmt.Println(input.Dumps())
 	naiveStrategy := strategies.NewNaiveStrategy()
-	output := naiveStrategy.Apply(input)
+	output := naiveStrategy.Apply(input).(*datastructures.Solution)
 	parserutils.ToStdOut(output.ToStrings())
+
+	//println(fmt.Sprintf("Score %d", scorer.Score(input, output)))
+
 	return nil
 }
 

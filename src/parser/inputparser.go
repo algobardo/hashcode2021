@@ -63,7 +63,7 @@ func Parse(lines []string) *datastructures.Input {
 		lineNumber++
 	}
 
-	var cars []*datastructures.Car
+	cars := map[datastructures.CarID]*datastructures.Car{}
 	for c := 0; c < input.CarCount; c++ {
 		vals := strings.Split(lines[lineNumber], " ")
 		pathLength := parseInt(vals[0])
@@ -76,7 +76,7 @@ func Parse(lines []string) *datastructures.Input {
 			car.Path = append(car.Path, streets[streetID])
 		}
 		streets[car.Path[0].ID].Queue = append(streets[car.Path[0].ID].Queue, car.ID)
-		cars = append(cars, car)
+		cars[car.ID] = car
 		lineNumber++
 	}
 
