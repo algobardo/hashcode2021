@@ -2,6 +2,8 @@ package main
 
 import (
 	"github.com/alecthomas/kong"
+	"hashcode2021/m/v2/src/parserutils"
+	"hashcode2021/m/v2/src/strategies"
 )
 
 var CLI struct {
@@ -19,7 +21,10 @@ func main() {
 	ctx := kong.Parse(&CLI)
 	switch ctx.Command() {
 	case "parse <path>":
-
+		var s strategies.Strategy
+		var input strategies.Input
+		output := s.Apply(input)
+		parserutils.ToStdOut(output.ToStrings())
 	case "do-something-else":
 	default:
 		panic(ctx.Command())

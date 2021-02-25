@@ -1,6 +1,7 @@
 package parserutils
 
 import (
+	"fmt"
 	"io/ioutil"
 	"strings"
 )
@@ -34,4 +35,10 @@ func LoadInputAsString(filename string) (string, error) {
 
 func LoadInput(filename string) ([]byte, error) {
 	return ioutil.ReadFile(filename)
+}
+
+func ToStdOut(ls []string) {
+	for _, s := range ls {
+		fmt.Print(s)
+	}
 }
