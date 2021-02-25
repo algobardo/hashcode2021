@@ -1,13 +1,11 @@
 package strategies
 
-type Input interface {
-
-}
+import "hashcode2021/m/v2/src/datastructures"
 
 type Output interface {
 	ToStrings() []string
 }
 
 type Strategy interface {
-	Apply(input Input) Output
+	Apply(input *datastructures.Input) Output
 }

@@ -5,6 +5,7 @@ import (
 	"hashcode2021/m/v2/src/parser"
 	"hashcode2021/m/v2/src/parserutils"
 	"hashcode2021/m/v2/src/problemset"
+	"hashcode2021/m/v2/src/strategies"
 
 	"github.com/alecthomas/kong"
 )
@@ -35,10 +36,10 @@ func (p *NaiveStrategy) Run() error {
 		return err
 	}
 	input := parser.Parse(lines.Lines)
-	fmt.Println(input.Dumps())
-	//naiveStrategy := strategies.NewNaiveStrategy()
-	//output := naiveStrategy.Apply(input)
-	//parserutils.ToStdOut(output.ToStrings())
+	//fmt.Println(input.Dumps())
+	naiveStrategy := strategies.NewNaiveStrategy()
+	output := naiveStrategy.Apply(input)
+	parserutils.ToStdOut(output.ToStrings())
 	return nil
 }
 

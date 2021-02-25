@@ -1,10 +1,10 @@
 package input
 
 import (
+	"hashcode2021/m/v2/src/datastructures"
 	"hashcode2021/m/v2/src/parserutils"
-	"hashcode2021/m/v2/src/strategies"
 )
 
-func InputFromLines(lines *parserutils.Lines) strategies.Input {
+func InputFromLines(lines *parserutils.Lines) *datastructures.Input {
 	return nil
 }

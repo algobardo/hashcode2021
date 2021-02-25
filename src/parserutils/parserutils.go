@@ -39,6 +39,6 @@ func LoadInput(filename string) ([]byte, error) {
 
 func ToStdOut(ls []string) {
 	for _, s := range ls {
-		fmt.Print(s)
+		fmt.Println(s)
 	}
 }
