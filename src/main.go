@@ -1,17 +1,26 @@
 package main
 
 import (
-    "os"
-
-    "hashcode2021/m/v2/src/parser"
+	"github.com/alecthomas/kong"
 )
 
+var CLI struct {
+	Parse struct {
+		Print     bool `help:"print"`
+		Paths []string `arg name:"path" help:"Paths to parse." type:"path"`
+	} `cmd help:"Remove files."`
+
+	DoSomethingElse struct {
+		Paths []string `arg optional name:"path" help:"Paths to list." type:"path"`
+	} `cmd help:"List paths."`
+}
+
 func main() {
-    algo := os.Args[1]
-    name := os.Args[2]
-
-    input := parser.LoadInput("./data", name)
-
-    println(algo, name, input.String())
-
+	ctx := kong.Parse(&CLI)
+	switch ctx.Command() {
+	case "parse <path>":
+	case "ls":
+	default:
+		panic(ctx.Command())
+	}
 }
