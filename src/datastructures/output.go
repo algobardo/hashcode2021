@@ -9,8 +9,9 @@ type Solution struct {
 }
 
 type IntersectionSchedule struct {
-	IntersectionID  IntersectionID
-	StreetSchedules map[StreetID]*StreetSchedule
+	IntersectionID      IntersectionID
+	StreetSchedules     map[StreetID]*StreetSchedule
+	StreetSchedulesList []*StreetSchedule
 }
 
 type StreetSchedule struct {
@@ -24,7 +25,7 @@ func (s *Solution) ToStrings() []string {
 	for _, intersectionSchedule := range s.Schedules {
 		lines = append(lines, strconv.Itoa(int(intersectionSchedule.IntersectionID)))
 		lines = append(lines, strconv.Itoa(len(intersectionSchedule.StreetSchedules)))
-		for _, streetSchedule := range intersectionSchedule.StreetSchedules {
+		for _, streetSchedule := range intersectionSchedule.StreetSchedulesList {
 			lines = append(lines, string(streetSchedule.StreetID))
 			lines = append(lines, strconv.Itoa(streetSchedule.GreenLightDuration))
 		}

@@ -14,10 +14,12 @@ func (n *Naive) Apply(input *datastructures.Input) Output {
 		}
 
 		for _, streetID := range intersection.StreetsIn {
-			schedule.StreetSchedules[streetID] = &datastructures.StreetSchedule{
+			streetSchedule := &datastructures.StreetSchedule{
 				StreetID:           streetID,
 				GreenLightDuration: 1,
 			}
+			schedule.StreetSchedules[streetID] = streetSchedule
+			schedule.StreetSchedulesList = append(schedule.StreetSchedulesList, streetSchedule)
 		}
 		schedules[intersectionID] = schedule
 	}
