@@ -19,7 +19,11 @@ type StreetSchedule struct {
 	GreenLightDuration int
 }
 
-func MarshalToSolution(solution Solution) string {
+func (s *Solution) ToStrings() []string {
+	return strings.Split(MarshalToSolution(s), "\n")
+}
+
+func MarshalToSolution(solution *Solution) string {
 	var sb strings.Builder
 	sb.WriteString(strconv.Itoa(len(solution.Schedules)))
 	sb.WriteString("\n")
