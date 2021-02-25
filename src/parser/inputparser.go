@@ -3,7 +3,6 @@ package parser
 import (
 	"io/ioutil"
 	"path/filepath"
-	"sort"
 	"strconv"
 	"strings"
 
@@ -34,58 +33,56 @@ func LoadInput(folder, name string) *datastructures.Input {
 }
 
 func PostProcess(i *datastructures.Input) *datastructures.Input {
-	for _, library := range i.Libraries {
-		var sortedBooks []datastructures.SortedBook
-		for _, book := range library.Books {
-			sortedBooks = append(sortedBooks, datastructures.SortedBook{
-				Book:  book,
-				Score: i.BooksScore[book],
-			})
-		}
-		library.BestBooks = sortedBooks
-		sort.Slice(library.BestBooks, func(i, j int) bool {
-			return library.BestBooks[i].Score > library.BestBooks[j].Score
-		})
-	}
 	return i
 }
 
 func Parse(s string) *datastructures.Input {
 	lines := strings.Split(s, "\n")
-	firstLine := strings.Split(lines[0], " ")
-
+	lineNumber := 0
+	firstLine := strings.Split(lines[lineNumber], " ")
+	lineNumber++
 	input := &datastructures.Input{
-		BooksTotal:     parseInt(firstLine[0]),
-		LibrariesTotal: parseInt(firstLine[1]),
-		Days:           parseInt(firstLine[2]),
+		Duration:          parseInt(firstLine[0]),
+		IntersectionCount: parseInt(firstLine[1]),
+		StreetCount:       parseInt(firstLine[2]),
+		CarCount:          parseInt(firstLine[3]),
+		BonusPoints:       parseInt(firstLine[4]),
 	}
 
-	secondLine := strings.Split(lines[1], " ")
-	for _, bookScoreString := range secondLine {
-		input.BooksScore = append(input.BooksScore, parseInt(bookScoreString))
+	var streets map[datastructures.StreetID]*datastructures.Street
+	for s := 0; s < input.StreetCount; s++ {
+		vals := strings.Split(lines[lineNumber], " ")
+		street := &datastructures.Street{
+			ID:     datastructures.StreetID(vals[2]),
+			Start:  datastructures.IntersectionID(parseInt(vals[0])),
+			End:    datastructures.IntersectionID(parseInt(vals[1])),
+			Length: parseInt(vals[3]),
+			Queue:  []*datastructures.Car{},
+		}
+		streets[street.ID] = street
+		lineNumber++
 	}
 
-	for i := 2; i+1 < len(lines); i += 2 {
-		firstLibraryLine := strings.Split(lines[i], " ")
-		secondLibraryLine := strings.Split(lines[i+1], " ")
-
-		if len(firstLibraryLine) < 3 {
-			continue
+	var cars []*datastructures.Car
+	for c := 0; c < input.CarCount; c++ {
+		vals := strings.Split(lines[lineNumber], " ")
+		pathLength := parseInt(vals[0])
+		car := &datastructures.Car{
+			ID: datastructures.CarID(c),
 		}
 
-		//books := make(map[BookID]struct{}, parseInt(firstLibraryLine[0]))
-		var books []datastructures.BookID
-		for _, book := range secondLibraryLine {
-			books = append(books, datastructures.BookID(parseInt(book)))
+		for p := 0; p < pathLength; p++ {
+			streetID := datastructures.StreetID(vals[1+p])
+			car.Path = append(car.Path, streets[streetID])
 		}
 
-		input.Libraries = append(input.Libraries, &datastructures.Library{
-			DaysForSignUp:      parseInt(firstLibraryLine[1]),
-			BooksShippedPerDay: parseInt(firstLibraryLine[2]),
-			Books:              books,
-			ID:                 datastructures.LibraryID(len(input.Libraries)),
-		})
+		cars = append(cars, car)
+		lineNumber++
 	}
+
+	input.Streets = streets
+	input.Cars = cars
+
 	return input
 }
 

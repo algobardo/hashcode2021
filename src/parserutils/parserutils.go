@@ -15,7 +15,7 @@ func (l Lines) GetNth(n uint) string {
 }
 
 func (l Lines) GetNthValues(n uint) []string {
-	return strings.Split(l.lines[n]," ")
+	return strings.Split(l.lines[n], " ")
 }
 
 func LoadInputAsLines(filename string) (*Lines, error) {

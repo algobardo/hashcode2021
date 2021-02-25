@@ -14,8 +14,8 @@ type Car struct {
 
 type Street struct {
 	ID     StreetID
-	Start  *Intersection
-	End    *Intersection
+	Start  IntersectionID
+	End    IntersectionID
 	Length int
 	Queue  []*Car
 }
@@ -32,4 +32,7 @@ type Input struct {
 	StreetCount       int
 	CarCount          int
 	BonusPoints       int
+
+	Cars    []*Car
+	Streets map[StreetID]*Street
 }
